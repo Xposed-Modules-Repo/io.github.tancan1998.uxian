@@ -1,29 +1,62 @@
 # U 闲
 
-闲鱼净化与增强模块，包名 `io.github.tancan1998.uxian`，需要兼容 libxposed API 102 的框架。
+当前版本 **1.0**，与U 音统一版本命名。内部版本码 11061731，沿用正式签名，可覆盖更新 2026.11.06.1。本次仅同步版本信息，功能沿用上一正式版。
 
-功能：开屏及部分信息流广告过滤、消息与入口整理、首页导航与金刚位排序、任务执行计划和进度，以及可选调试和临时抓包。功能独立开关，按实际钩子挂载情况报告适配。
+**AI 生成项目**：本项目主要代码、文档、测试及构建配置由 AI（OpenAI ChatGPT / Codex，通过 Minis）生成并迭代，由项目维护者提出需求、审核并提供实测反馈。AI 生成不代表已经过完整人工安全审计。
 
-## 源码、AI 声明与开源协议
+闲鱼净化和增强模块：开屏与部分信息流广告过滤、消息与入口整理、首页导航和金刚位排序、任务执行计划与进度、调试和临时抓包。各功能独立开关，按实际钩子挂载情况报告适配。
 
-主要代码、文档、测试和构建配置由 AI（OpenAI ChatGPT / Codex，通过 Minis）生成并迭代，由维护者提出需求、审核和提供实测反馈。
+## 已实测宿主版本
 
-- 完整源码：https://github.com/TanCan1998/uxian
-- 下载：https://github.com/Xposed-Modules-Repo/io.github.tancan1998.uxian/releases
-- 协议：GNU GPL v3.0（GPL-3.0-only）
-- 许可证原文：https://github.com/TanCan1998/uxian/blob/main/LICENSE
-- 第三方版权及许可证：https://github.com/TanCan1998/uxian/blob/main/NOTICE.md
+| 宿主 | 包名 | 验证来源 |
+| --- | --- | --- |
+| 闲鱼 7.28.91 / versionCode 529 | `com.taobao.idlefish` | 维护者于 2026-11-06 确认全部现有功能正常 |
 
-特别感谢芝麻粒 M（aw1y2z/Sesame-M）的 RPC 通道、任务过滤、失败黑名单和调度参考；感谢其上游 Dragon813/Sesame-GR、SenOffical/Sesame-TK、constanline/XQuickEnergy、pansong291/XQuickEnergy，以及相关维护者和贡献者。完整来源、许可证和致谢保留在源码仓库。本项目并非上述项目的官方版本。
+2026-11-06：用户确认当前安装版本的全部现有功能在上述宿主上实测正常。历史还验证过闲鱼 7.28.80 / 525。公开版另将早期硬编码的城市/精确坐标改为空值，以保护维护者隐私；依赖位置的任务尚未针对此项调整重新进行真机验证，可能由服务端拒绝或采用默认区域。CI/契约回归不替代新的真机测试。
 
-## 已实测宿主与验证边界
+不设置宿主版本号门禁；逐项检查类、方法签名、返回类型与实际挂载结果。挂载成功、实际调用和拦截命中分别报告。其他宿主版本尚未验证。
 
-闲鱼 **7.28.91 / versionCode 529**：维护者于 2026-11-06 确认当前已安装版本全部现有功能正常；历史亦验证过 7.28.80 / 525。公开版已清空旧代码中的精确位置默认值，依赖位置的任务和本次包名迁移尚未重新进行真机验证。契约测试、云端构建和静态检查不替代新的真机验收。
+## 安装与使用
 
-临时抓包与报告可能包含当前账户的请求、响应或身份信息，分享前需脱敏。HTTP 调试默认关闭，仅绑定本机回环且未设置鉴权，请仅调试时启用。
+下载 [Releases](https://github.com/TanCan1998/uxian/releases) 中的 APK，在兼容 libxposed API 102 的框架中启用，并将作用域设为对应宿主，然后重启宿主。包名为 `io.github.tancan1998.uxian`。仅发布现代 API 102 构建；U 闲最低 Android 8，U 音最低 Android 9。
 
-## 从旧包名迁移
+U 闲设置通过闲鱼中的模块入口进入；功能按需启用。
 
-新版包名为 `io.github.tancan1998.uxian`，旧包名为 `com.xiandehuang.u`。请先停用旧模块，再安装并启用新模块、设置闲鱼作用域后重启宿主，避免重复 Hook。本次发行没有自动替换设备上已安装的模块。
+临时抓包和报告可能包含当前账户的请求、响应或身份信息，仅保存在本机，分享前需自行脱敏。HTTP 调试默认关闭，仅绑定 127.0.0.1，但未设置鉴权；开启后同机其他应用可能访问，请仅在调试时启用。
 
-本仓库只分发模块说明和 APK，完整对应源码与许可证见上方链接。
+首次公开发行使用独立持久签名，无法直接覆盖早期本地测试证书安装的同包名模块。请先备份配置，再由使用者决定如何迁移；不要卸载宿主。
+
+## 构建
+
+GitHub Actions 使用 `ubuntu-latest`、Temurin JDK 17，以及发布时查询的最新官方稳定 Action：checkout v7.0.1、setup-java v6.2.0、upload-artifact v7.0.2，固定完整提交 SHA，Dependabot 每周检查更新。`ubuntu-latest` 跟随 GitHub 托管的最新稳定 Ubuntu 镜像。
+
+```sh
+python3 tools/bootstrap.py
+python3 -m pip install -r requirements-build.txt
+sh tools/build.sh new
+```
+
+依赖版本、下载地址和 SHA-256 在 `tools/dependencies.json`；工具下载到 `.tools/`，不依赖维护者设备路径。产物为 `build/new/U闲.apk`。普通本地构建使用测试证书；正式 CI 使用 GitHub Secrets 中的持久密钥。推送 `v*` 标签后发布相同 APK 与 SHA256SUMS 到源码仓库和个人模块分发仓库，详见 [发布说明](RELEASING.md)。
+
+## 隐私与源码范围
+
+公开 Git 历史已压缩，仅保留关键源码与发布配置提交，作者邮箱使用 GitHub noreply。仓库排除真实抓包数据库、请求回执、账户和位置示例、截图、宿主反编译代码、会话、令牌、签名私钥、本地研究记录及构建产物。模块运行所需的账户状态来自本机宿主，不在源码中预置真实账户。AI/宿主/框架均非本项目的官方背书方。
+
+临时抓包和报告可能包含当前账户的请求、响应或身份信息，仅保存在本机，分享前需自行脱敏。HTTP 调试默认关闭，仅绑定 127.0.0.1，但未设置鉴权；开启后同机其他应用可能访问，请仅在调试时启用。
+
+## 开源协议与致谢
+
+本项目以 **GNU GPL v3.0（GPL-3.0-only）** 发布，完整条款见 [LICENSE](LICENSE)。复制、修改与分发须遵守 GPL，包括分发修改版时提供相应源码及保留版权/许可证声明。第三方组件保留各自许可证，见 [NOTICE](NOTICE.md) 和 `licenses/`；GPL 不授予宿主商标、账号或服务端内容的权利。本项目不包含官方宿主 APK 或反编译源码。
+
+特别感谢 [芝麻粒 M / aw1y2z/Sesame-M](https://github.com/aw1y2z/Sesame-M)，其 RPC 通道、任务过滤、失败黑名单和调度思路为本项目提供了重要参考，相关代码注释保留来源。参考源码基线为 `569fac60031e1642acbcd8bece62de56e1ae91b5`。同时感谢其上游 [Dragon813/Sesame-GR](https://github.com/Dragon813/Sesame-GR)、[SenOffical/Sesame-TK](https://github.com/SenOffical/Sesame-TK)、[constanline/XQuickEnergy](https://github.com/constanline/XQuickEnergy)、[pansong291/XQuickEnergy](https://github.com/pansong291/XQuickEnergy)，以及 TKaxv-7S、LazyImmortal、Fansirsqi 等芝麻粒生态维护者。
+
+本项目不是上述项目的官方版本，也未获得其背书。
+
+
+## 官方收录包名迁移（2026.11.06.1）
+
+官方机器人拒绝旧包名 `com.xiandehuang.u` 的域名验证。本发行版改为 `io.github.tancan1998.uxian`，源码命名空间、模块入口、资源包名、Provider authority、重启 action 和调用方检查均同步迁移。旧版 Release 仅保留历史，不应与新版同时启用在同一宿主。
+
+新旧包名不同，无法原地覆盖。迁移时请先停用旧模块，再安装并启用新版、设置宿主作用域后重启宿主；不要同时启用两份模块。模块发行签名继续使用原项目的持久签名。当前已装模块未在本次发布中替换。宿主私有配置键维持原样，但新包名发行版尚未完成真机回归，不能把旧安装版的实测结论视为新版验收。
+
+完整源码：https://github.com/TanCan1998/uxian
